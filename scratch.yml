@@ -1,0 +1,15 @@
+---
+- name: Configure scratch.
+  hosts: scratch
+  become: true
+  roles:
+    - role: docker
+      tags: [ docker ]
+    - role: autovarnish
+      tags: [ autovarnish, varnish ]
+    - role: socket_sounds
+      tags: [ socket_sounds, sounds ]
+    - role: web
+      tags: [ web ]
+    - role: swapfile
+      tags: [ swapfile, swap ]

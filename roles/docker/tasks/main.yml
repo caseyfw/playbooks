@@ -1,0 +1,51 @@
+---
+- name: Ensure docker group exists.
+  group:
+    name: docker
+
+- name: Install apt key management tools.
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Add docker apt key.
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  register: add_key_output
+  changed_when: add_key_output.stdout.find('new signatures') != -1
+
+- name: Determine release.
+  shell: lsb_release -cs
+  register: lsb_release
+  changed_when: false
+  ignore_errors: true
+
+- name: Ensure docker apt repo is present.
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ lsb_release.stdout }} stable"
+    filename: docker
+    update_cache: yes
+
+- name: Ensure docker packages are installed and up to date.
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - docker-ce
+
+- name: Make sure docker is running and enabled for restart after a reboot.
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Ensure docker images cleanup script is present in daily cron.
+  copy:
+    src: "docker-system-prune"
+    dest: "/etc/cron.daily/docker-system-prune"
+    mode: "0755"
+  tags: scripts

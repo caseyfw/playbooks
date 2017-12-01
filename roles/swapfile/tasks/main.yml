@@ -1,0 +1,10 @@
+---
+- name: Create swapfile.
+  shell: fallocate -l 1GiB /swapfile
+  args:
+    creates: /swapfile
+
+- name: Ensure swapfile is root read-only.
+  file:
+    path: /swapfile
+    mode: 600

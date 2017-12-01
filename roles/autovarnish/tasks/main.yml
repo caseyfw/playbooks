@@ -1,0 +1,24 @@
+---
+- name: Ensure varnish config directory exists.
+  file:
+    path: /etc/varnish
+    recurse: yes
+    state: directory
+
+- name: Ensure varnish config is present.
+  copy:
+    src: config.vcl
+    dest: /etc/varnish/config.vcl
+    force: no # Don't replace existing varnish config.
+
+- name: Ensure autovarnish container is present.
+  docker_container:
+    name: autovarnish
+    image: caseyfw/autovarnish
+    pull: true
+    state: started
+    restart_policy: always
+    ports:
+      - "80:80"
+    volumes:
+      - "/etc/varnish:/varnish"
