@@ -8,3 +8,24 @@
   file:
     path: /swapfile
     mode: 600
+
+- name: Ensure swapfile exists in fstab.
+  lineinfile:
+    path: /etc/fstab
+    line: '/swapfile none swap sw 0 0'
+    regexp: '^\/swapfile'
+  register: swapfile_in_fstab
+
+- name: Make swapfile.
+  command: mkswap -f /swapfile
+  when: swapfile_in_fstab.changed
+
+- name: Enable swap.
+  command: swapon /swapfile
+  when: swapfile_in_fstab.changed
+
+- name: Ensure swapiness is set in sysctl.conf.
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'vm.swappiness=60'
+    regexp: '^vm\.swappiness'
