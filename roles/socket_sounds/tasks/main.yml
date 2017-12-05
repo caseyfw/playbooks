@@ -21,4 +21,14 @@
     env:
       SERVER_URL: ws://sounds.caseyfulton.com/
       SOUNDS_URL: http://sounds.caseyfulton.com/sounds/
-      
+
+- name: Ensure sounds autovarnish config is present.
+  copy:
+    src: sounds.vcl
+    dest: /etc/varnish/sounds.vcl
+
+- name: Ensure sounds.vcl is included in autovarnish config.vcl.
+  lineinfile:
+    path: /etc/varnish/config.vcl
+    line: 'include "./sounds.vcl";'
+    insertbefore: BOF

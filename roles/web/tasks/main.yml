@@ -38,7 +38,21 @@
 - name: Set default vhost to listen on 8080.
   lineinfile:
     path: /etc/apache2/sites-enabled/000-default.conf
-    regexp: '^<VirtualHost \*:80>'
+    regexp: '^<VirtualHost \*:8080>$'
     line: '<VirtualHost *:8080>'
   notify:
     - restart apache
+
+- name: Ensure mysql container is present.
+  docker_container:
+    name: mysql
+    image: mysql
+    pull: true
+    state: started
+    restart_policy: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - "/var/lib/mysql:/var/lib/mysql"
+    env:
+      MYSQL_ROOT_PASSWORD: password
