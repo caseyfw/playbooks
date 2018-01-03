@@ -9,7 +9,7 @@
   copy:
     src: config.vcl
     dest: /etc/varnish/config.vcl
-    force: no # Don't replace existing varnish config.
+    force: false # Don't replace existing config.
 
 - name: Ensure autovarnish container is present.
   docker_container:
